@@ -1,28 +1,31 @@
 import { eachDayOfInterval } from 'date-fns';
+import { notFound } from 'next/navigation';
+import { supabase } from './supabase';
 
 /////////////
 // GET
 
-export async function getCabin(id) {
+export async function getRoom(id) {
   const { data, error } = await supabase
-    .from('cabins')
+    .from('rooms')
     .select('*')
     .eq('id', id)
     .single();
 
   // For testing
-  // await new Promise((res) => setTimeout(res, 1000));
+  await new Promise((res) => setTimeout(res, 1000));
 
   if (error) {
     console.error(error);
+    notFound();
   }
 
   return data;
 }
 
-export async function getCabinPrice(id) {
+export async function getRoomPrice(id) {
   const { data, error } = await supabase
-    .from('cabins')
+    .from('rooms')
     .select('regularPrice, discount')
     .eq('id', id)
     .single();
@@ -34,15 +37,15 @@ export async function getCabinPrice(id) {
   return data;
 }
 
-export const getCabins = async function () {
+export const getRooms = async function () {
   const { data, error } = await supabase
-    .from('cabins')
+    .from('rooms')
     .select('id, name, maxCapacity, regularPrice, discount, image')
     .order('name');
 
   if (error) {
     console.error(error);
-    throw new Error('Cabins could not be loaded');
+    throw new Error('Rooms could not be loaded');
   }
 
   return data;
@@ -78,9 +81,9 @@ export async function getBooking(id) {
 export async function getBookings(guestId) {
   const { data, error, count } = await supabase
     .from('bookings')
-    // We actually also need data on the cabins as well. But let's ONLY take the data that we actually need, in order to reduce downloaded data.
+    // We actually also need data on the rooms as well. But let's ONLY take the data that we actually need, in order to reduce downloaded data.
     .select(
-      'id, created_at, startDate, endDate, numNights, numGuests, totalPrice, guestId, cabinId, cabins(name, image)'
+      'id, created_at, startDate, endDate, numNights, numGuests, totalPrice, guestId, roomId, rooms(name, image)'
     )
     .eq('guestId', guestId)
     .order('startDate');
@@ -93,7 +96,7 @@ export async function getBookings(guestId) {
   return data;
 }
 
-export async function getBookedDatesByCabinId(cabinId) {
+export async function getBookedDatesByRoomId(roomId) {
   let today = new Date();
   today.setUTCHours(0, 0, 0, 0);
   today = today.toISOString();
@@ -102,7 +105,7 @@ export async function getBookedDatesByCabinId(cabinId) {
   const { data, error } = await supabase
     .from('bookings')
     .select('*')
-    .eq('cabinId', cabinId)
+    .eq('roomId', roomId)
     .or(`startDate.gte.${today},status.eq.checked-in`);
 
   if (error) {

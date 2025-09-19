@@ -13,7 +13,7 @@ export async function getRoom(id) {
     .single();
 
   // For testing
-  await new Promise((res) => setTimeout(res, 1000));
+  // await new Promise((res) => setTimeout(res, 2000));
 
   if (error) {
     console.error(error);
@@ -108,6 +108,8 @@ export async function getBookedDatesByRoomId(roomId) {
     .eq('roomId', roomId)
     .or(`startDate.gte.${today},status.eq.checked-in`);
 
+  // await new Promise((res) => setTimeout(res, 2000));
+
   if (error) {
     console.error(error);
     throw new Error('Bookings could not get loaded');
@@ -129,6 +131,7 @@ export async function getBookedDatesByRoomId(roomId) {
 export async function getSettings() {
   const { data, error } = await supabase.from('settings').select('*').single();
 
+  // await new Promise((res) => setTimeout(res, 2000));
   if (error) {
     console.error(error);
     throw new Error('Settings could not be loaded');

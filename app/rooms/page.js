@@ -1,7 +1,8 @@
 import RoomList from '@/app/_components/RoomList';
-import { getRooms } from '../_lib/data-service';
 import { Suspense } from 'react';
 import Spinner from '../_components/Spinner';
+import Filter from '../_components/Filter';
+import ReservationReminder from '../_components/ReservationReminder';
 
 export const metadata = {
   title: 'Rooms',
@@ -9,9 +10,9 @@ export const metadata = {
 
 export const revalidate = 3600;
 
-export default async function Page() {
-  console.log('Starting');
-  const rooms = await getRooms();
+export default async function Page({ searchParams }) {
+  console.log(searchParams);
+  const filter = searchParams?.capacity ?? 'all';
 
   return (
     <div>
@@ -27,8 +28,13 @@ export default async function Page() {
         Welcome to paradise.
       </p>
 
-      <Suspense fallback={<Spinner />}>
-        <RoomList />
+      <div className='flex justify-end mb-8'>
+        <Filter />
+      </div>
+
+      <Suspense fallback={<Spinner />} key={filter}>
+        <RoomList filter={filter} />
+        <ReservationReminder />
       </Suspense>
     </div>
   );

@@ -23,8 +23,6 @@ export async function generateStaticParams() {
 export default async function Page({ params }) {
   const room = await getRoom(params.roomId);
 
-  console.log(params);
-
   return (
     <div className='max-w-6xl mx-auto mt-8'>
       <Room room={room} />

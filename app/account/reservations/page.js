@@ -1,12 +1,14 @@
-import ReservationCard from '@/app/_components/ReservationCard';
+import ReservationList from '@/app/_components/ReservationList';
+import { auth } from '@/app/_lib/auth';
+import { getBookings } from '@/app/_lib/data-service';
 
 export const metadata = {
   title: 'Update Reservations',
 };
 
-export default function Page() {
-  // CHANGE
-  const bookings = [];
+export default async function Page() {
+  const session = await auth();
+  const bookings = await getBookings(session.user.guestId);
 
   return (
     <div>
@@ -17,16 +19,12 @@ export default function Page() {
       {bookings.length === 0 ? (
         <p className='text-lg'>
           You have no reservations yet. Check out our{' '}
-          <a className='underline text-accent-500' href='/cabins'>
-            luxury cabins &rarr;
+          <a className='underline text-accent-500' href='/rooms'>
+            luxury rooms &rarr;
           </a>
         </p>
       ) : (
-        <ul className='space-y-6'>
-          {bookings.map((booking) => (
-            <ReservationCard booking={booking} key={booking.id} />
-          ))}
-        </ul>
+        <ReservationList bookings={bookings} />
       )}
     </div>
   );
